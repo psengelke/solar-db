@@ -10,7 +10,8 @@
            ring-cors/ring-cors         {:mvn/version "0.1.13"}
            metosin/malli               {:mvn/version "0.17.0"}
            io.github.tonsky/clj-reload {:mvn/version "0.7.1"}
-           clj-http/clj-http           {:mvn/version "3.13.0"}}
+           clj-http/clj-http           {:mvn/version "3.13.0"}
+           dk.ative/docjure            {:mvn/version "1.21.0"}}
 
  :aliases {:xtdb       {:jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
                                    "-Dio.netty.tryReflectionSetAccessible=true"]}
@@ -19,6 +20,6 @@
                         :extra-deps          {com.github.flow-storm/clojure        {:mvn/version "1.12.0-2"}
                                               com.github.flow-storm/flow-storm-dbg {:mvn/version "4.0.2"}}
                         :jvm-opts            ["-Dclojure.storm.instrumentEnable=true"
-                                              "-Dclojure.storm.instrumentOnlyPrefixes=mmdb.,user"
+                                              "-Dclojure.storm.instrumentOnlyPrefixes=solar-db.,user"
                                               "-Dflowstorm.startRecording=false"
                                               "-Dflowstorm.theme=auto"]}}}
