@@ -3,6 +3,7 @@
     [malli.core :as m]
     [malli.registry :as mr]
     [solar-db.history.malli :as history]
+    [solar-db.xform :as xf]
     [tick.core :as t]))
 
 (defn create-decoder
@@ -53,10 +54,24 @@
                        :json-schema/type   "string"
                        :json-schema/format "time"}}))
 
+(def ^:private Keyword
+  "A schema for a keyword."
+  (m/-simple-schema
+    {:type            :keyword
+     :pred            keyword?
+     :type-properties {:error/message "should be a keyword"
+                       :decode        (create-decoder xf/str->keyword)
+                       :encode        xf/keyword->str
+                       :decode/string (create-decoder xf/str->keyword)
+                       :encode/string xf/keyword->str
+                       :decode/json   (create-decoder keyword)
+                       :encode/json   xf/keyword->str}}))
+
 (def ^:private ext-schemas
   {:time/local-date      LocalDateSchema
    :time/local-date-time LocalDateTimeSchema
-   :time/local-time      LocalTime})
+   :time/local-time      LocalTime
+   :keyword              Keyword})
 
 (mr/set-default-registry!
   (mr/composite-registry
