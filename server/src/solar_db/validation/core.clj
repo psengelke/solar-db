@@ -1,4 +1,4 @@
-(ns validation.core
+(ns solar-db.validation.core
   (:require [malli.core :as m]))
 
 (defn validate

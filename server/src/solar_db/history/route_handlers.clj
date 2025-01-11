@@ -1,9 +1,9 @@
 (ns solar-db.history.route-handlers
-  (:require [solar-db.db :as db]
-            [validation.core :as v]
-            [xtdb.api :as xt]
+  (:require [ring.util.response :as res]
+            [solar-db.db :as db]
             [solar-db.history.db :as history.db]
-            [ring.util.response :as res]))
+            [solar-db.validation.core :as v]
+            [xtdb.api :as xt]))
 
 (defn fetch-detailed-history
   "Fetches detailed history for a period of time, at a 5-minute interval."
