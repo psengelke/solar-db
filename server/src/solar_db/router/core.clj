@@ -13,8 +13,19 @@
             [ring.adapter.jetty :as jetty]
             [solar-db.router.malli]
             [solar-db.router.middleware :as middleware]
-            [solar-db.router.routes :as routes])
+            [solar-db.router.routes :as routes]
+            [solar-db.xform :as xf])
   (:import (org.eclipse.jetty.server Server)))
+
+(def ^:private muuntaja-instance
+  (m/create
+    (-> m/default-options
+        (assoc-in
+          [:formats "application/json" :encoder-opts]
+          {:encode-key-fn xf/keyword->str})
+        (assoc-in
+          [:formats "application/json" :decoder-opts]
+          {:decode-key-fn xf/str->keyword}))))
 
 (def ^:private router-options
   {:validate  spec/validate
@@ -30,7 +41,7 @@
        :default-values   true
        :options          nil})
 
-    :muuntaja m/instance
+    :muuntaja muuntaja-instance
     :middleware
     [middleware/exception-middleware
      middleware/cors-middleware
