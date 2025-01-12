@@ -1,20 +1,19 @@
 import {ReactNode} from "react";
 import classNames from "classnames";
 
-export default function DashboardWidget(props: DashboardWidgetProps) {
+export default function Card(props: CardProps) {
     return (<div
         className={classNames(
-            "flex flex-col self-start rounded-2xl p-4 overflow-hidden",
-            "bg-gray-200 dark:bg-gray-600",
+            "flex flex-col rounded-2xl p-4 overflow-hidden",
+            "border-[1px] border-gray-300 dark:border-gray-700",
             props.className,
         )}
     >
         {props.children}
     </div>);
-
 };
 
-interface DashboardWidgetProps {
+interface CardProps {
     className?: string | undefined,
     children: ReactNode,
 }

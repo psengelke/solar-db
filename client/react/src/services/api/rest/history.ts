@@ -35,7 +35,7 @@ export interface FetchHistoryRequest {
     endDate: string,
 }
 
-export interface HistoryData {
+export interface HistoryDatum {
     plant: string;
     date: string;
     granularity: HistoryGranularity.daily | HistoryGranularity.monthly | HistoryGranularity.yearly;
@@ -49,7 +49,7 @@ export interface HistoryData {
 }
 
 export interface FetchHistoryResponse {
-    data: HistoryData[];
+    data: HistoryDatum[];
 }
 
 export interface FetchSocStatsRequest {
@@ -57,7 +57,7 @@ export interface FetchSocStatsRequest {
     endTimestamp: string,
 }
 
-export interface SocStatsData {
+export interface SocStatsDatum {
     time: string;
     min: number;
     max: number;
@@ -68,7 +68,7 @@ export interface SocStatsData {
 }
 
 export interface FetchSocStatsResponse {
-    data: SocStatsData[],
+    data: SocStatsDatum[],
 }
 
 export async function fetchDetailedHistory

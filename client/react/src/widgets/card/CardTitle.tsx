@@ -1,9 +1,9 @@
 import {ReactNode} from "react";
 
-export default function DashboardWidgetTitle(props: DashboardWidgetTitleProps) {
+export default function CardTitle(props: CardTitle) {
     return (<p className={"text-lg"}>{props.children}</p>);
 }
 
-interface DashboardWidgetTitleProps {
+interface CardTitle {
     children: ReactNode;
 }

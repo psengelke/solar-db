@@ -1,9 +1,11 @@
 import {Action, configureStore, ThunkAction} from "@reduxjs/toolkit";
-import dashboardReducer from "@/features/dashboard/dashboardSlice.ts";
+import allTimeReducer from "@/pages/all-time-page/allTimePageSlice.ts";
+import dayPageReducer from "@/pages/day-page/dayPageSlice.ts";
 
 export const store = configureStore({
     reducer: {
-        dashboard: dashboardReducer
+        allTimePage: allTimeReducer,
+        dayPage: dayPageReducer,
     },
 });
 

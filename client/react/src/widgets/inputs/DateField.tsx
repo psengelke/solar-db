@@ -1,16 +1,17 @@
 import {DateTime} from "luxon";
 import {useEffect, useState} from "react";
-import InputBase from "@/components/inputs/InputBase.tsx";
+import InputBase from "@/widgets/inputs/InputBase.tsx";
 import classNames from "classnames";
-import InputLabel from "@/components/inputs/InputLabel.tsx";
-import IconButton from "@/components/buttons/IconButton.tsx";
-import Icon from "@/components/Icon.tsx";
+import InputLabel from "@/widgets/inputs/InputLabel.tsx";
+import IconButton from "@/widgets/buttons/IconButton.tsx";
+import Icon from "@/widgets/Icon.tsx";
 
 interface DateFieldProps {
     label?: string;
     placeholder?: string;
     value: DateTime | null | undefined;
     onChange: (date: DateTime | null) => void;
+    fullWidth?: boolean;
 }
 
 export default function DateField(props: DateFieldProps) {
@@ -23,7 +24,7 @@ export default function DateField(props: DateFieldProps) {
 
     return (
 
-        <InputBase focused={focused}>
+        <InputBase focused={focused} fullWidth={props.fullWidth}>
 
             <input
 
