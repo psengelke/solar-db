@@ -1,6 +1,6 @@
 (ns solar-db.history.db
   (:require [solar-db.db :as db]
-            [tick.core :as t]
+            [tick.core]
             [xtdb.api :as xt]))
 
 (defn fetch-detailed-history
@@ -40,7 +40,7 @@
                        [?e :timestamp ?timestamp]
                        [(>= ?timestamp ?lb)]
                        [(<= ?timestamp ?ub)]
-                       [(t/time ?timestamp) ?time]
+                       [(tick.core/time ?timestamp) ?time]
                        [?e :soc ?soc]]}
 
              (:start-timestamp req)
@@ -96,9 +96,8 @@
 
   (fetch-history
     (xt/db (db/get-node))
-    {:end-date #time/date "2021-01-31",
+    {:end-date    #time/date "2021-01-31",
      :granularity :daily,
-     :start-date #time/date "2021-01-01"})
-
+     :start-date  #time/date "2021-01-01"})
 
   )

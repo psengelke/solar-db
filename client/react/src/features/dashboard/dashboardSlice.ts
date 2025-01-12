@@ -1,11 +1,19 @@
 import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {
     DetailedHistoryDatum,
-    fetchDetailedHistory as _fetchDetailedHistory, HistoryData, SocStatsData
+    fetchDetailedHistory as _fetchDetailedHistory,
+    fetchSocStats as _fetchSocStats,
+    fetchHistory as _fetchHistory,
+    HistoryData,
+    SocStatsData, HistoryGranularity,
 } from "@/services/api/rest/history.ts";
 import {AsyncMetaState, AsyncMetaStateUtils} from "@/utils/store.ts";
 import {AppThunk} from "@/store/store.ts";
 import {DateTime} from "luxon";
+
+interface EnhancedSocStatsData extends SocStatsData {
+    stdDevRange: [number, number];
+}
 
 interface DashboardState extends AsyncMetaState {
 
@@ -13,6 +21,7 @@ interface DashboardState extends AsyncMetaState {
         data: HistoryData[];
         startDate: number;
         endDate: number;
+        granularity: HistoryGranularity;
     };
 
     detailedHistory: {
@@ -22,7 +31,7 @@ interface DashboardState extends AsyncMetaState {
     };
 
     socStats: {
-        data: SocStatsData[];
+        data: EnhancedSocStatsData[];
         startDate: number;
         endDate: number;
     };
@@ -36,7 +45,8 @@ const initialState: DashboardState = AsyncMetaStateUtils.withAsyncMetaState(
         history: {
             data: [],
             startDate: now.startOf("day").toMillis(),
-            endDate: now.endOf("day").toMillis(),
+            endDate: now.plus({day: 30}).endOf("day").toMillis(),
+            granularity: HistoryGranularity.daily,
         },
 
         detailedHistory: {
@@ -48,7 +58,7 @@ const initialState: DashboardState = AsyncMetaStateUtils.withAsyncMetaState(
         socStats: {
             data: [],
             startDate: now.startOf("day").toMillis(),
-            endDate: now.endOf("day").toMillis(),
+            endDate: now.plus({day: 30}).endOf("day").toMillis(),
         },
 
     }
@@ -70,7 +80,15 @@ const _setDetailedHistoryEndDate = (state: DashboardState, action: PayloadAction
 }
 
 const setSocStats = (state: DashboardState, action: PayloadAction<SocStatsData[]>) => {
-    state.socStats.data = action.payload;
+    state.socStats.data = action.payload.map(d => (
+        {
+            ...d,
+            stdDevRange: [
+                Math.max(d.avg - d.stdDev, d.min),
+                Math.min(d.avg + d.stdDev, d.max),
+            ],
+        }
+    ));
 }
 
 const _setSocStatsStartDate = (state: DashboardState, action: PayloadAction<number>) => {
@@ -93,6 +111,10 @@ const _setHistoryEndDate = (state: DashboardState, action: PayloadAction<number>
     state.history.endDate = action.payload;
 }
 
+const _setHistoryGranularity = (state: DashboardState, action: PayloadAction<HistoryGranularity>) => {
+    state.history.granularity = action.payload;
+}
+
 const slice = createSlice({
     name: "dashboard",
     initialState: initialState,
@@ -108,6 +130,7 @@ const slice = createSlice({
         setHistory,
         setHistoryStartDate: _setHistoryStartDate,
         setHistoryEndDate: _setHistoryEndDate,
+        setHistoryGranularity: _setHistoryGranularity,
     }
 });
 
@@ -180,7 +203,32 @@ export const selectDetailedHistoryDateRage = createSelector(
  * Fetches SOC statistics for a period of time.
  */
 export const fetchSocStats = (): AppThunk => async (dispatch, getState) => {
-    // TODO
+
+    try {
+
+        const state = getState();
+        const fmt = "yyyy-MM-dd'T'HH:mm";
+        const start = DateTime.fromMillis(state.dashboard.socStats.startDate).toFormat(fmt);
+        const end = DateTime.fromMillis(state.dashboard.socStats.endDate).toFormat(fmt);
+        if (!start || !end || end < start) {
+            return;
+        }
+
+        dispatch(slice.actions.startRequest());
+        const response = await _fetchSocStats({
+            request: {
+                startTimestamp: start,
+                endTimestamp: end,
+            }
+        });
+
+        dispatch(slice.actions.setSocStats(response.data));
+
+    } catch (e) {
+        console.error(e);
+    } finally {
+        dispatch(slice.actions.endRequest());
+    }
 }
 
 /**
@@ -189,7 +237,9 @@ export const fetchSocStats = (): AppThunk => async (dispatch, getState) => {
  * @param date The start date.
  */
 export const setSocStatsStartDate = (date: DateTime): AppThunk => async (dispatch) => {
-    // TODO
+    dispatch(slice.actions.setSocStatsStartDate(date.startOf("day").toMillis()));
+    dispatch(slice.actions.setSocStatsEndDate(date.plus({day: 30}).endOf("day").toMillis()));
+    dispatch(fetchSocStats());
 }
 
 /**
@@ -198,7 +248,8 @@ export const setSocStatsStartDate = (date: DateTime): AppThunk => async (dispatc
  * @param date The end date.
  */
 export const setSocStatsEndDate = (date: DateTime): AppThunk => async (dispatch) => {
-    // TODO
+    dispatch(slice.actions.setSocStatsEndDate(date.endOf("day").toMillis()));
+    dispatch(fetchSocStats());
 }
 
 /**
@@ -214,7 +265,36 @@ export const selectSocStatsDateRange = createSelector(
  * Fetches history data for a period of time.
  */
 export const fetchHistory = (): AppThunk => async (dispatch, getState) => {
-    // TODO
+
+    try {
+
+        const state = getState();
+        const fmt = "yyyy-MM-dd";
+        const start = DateTime.fromMillis(state.dashboard.history.startDate).toFormat(fmt);
+        const end = DateTime.fromMillis(state.dashboard.history.endDate).toFormat(fmt);
+        const granularity = state.dashboard.history.granularity;
+
+        if (!start || !end || end < start) {
+            return;
+        }
+
+        dispatch(slice.actions.startRequest());
+        const response = await _fetchHistory({
+            request: {
+                granularity: granularity,
+                startDate: start,
+                endDate: end,
+            }
+        });
+
+        dispatch(slice.actions.setHistory(response.data));
+
+    } catch (e) {
+        console.error(e);
+    } finally {
+        dispatch(slice.actions.endRequest());
+    }
+
 }
 
 /**
@@ -234,3 +314,22 @@ export const setHistoryStartDate = (date: DateTime): AppThunk => async (dispatch
 export const setHistoryEndDate = (date: DateTime): AppThunk => async (dispatch) => {
     // TODO
 }
+
+/**
+ * Sets the granularity for the history data.
+ * If both the start and end dates are set and valid, new data will be fetched.
+ * @param granularity The granularity.
+ */
+export const setHistoryGranularity = (granularity: HistoryGranularity): AppThunk => async (dispatch, getState) => {
+    dispatch(slice.actions.setHistoryGranularity(granularity));
+    dispatch(fetchHistory());
+}
+
+/**
+ * Selects the history date range as a pair of {@link DateTime} instances.
+ */
+export const selectHistoryDateRange = createSelector(
+    (state: { dashboard: DashboardState }) => state.dashboard.history.startDate,
+    (state: { dashboard: DashboardState }) => state.dashboard.history.endDate,
+    (start, end) => [DateTime.fromMillis(start), DateTime.fromMillis(end)],
+);

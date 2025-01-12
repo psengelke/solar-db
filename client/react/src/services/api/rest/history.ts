@@ -85,3 +85,33 @@ export async function fetchDetailedHistory
     return response.json();
 
 }
+
+export async function fetchHistory
+(args: { request: FetchHistoryRequest })
+    : Promise<FetchHistoryResponse> {
+
+    const response = await fetch("http://localhost:11111/history/fetch", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(args.request),
+    });
+
+    if (!response.ok) throw response;
+    return response.json();
+
+}
+
+export async function fetchSocStats
+(args: { request: FetchSocStatsRequest })
+    : Promise<FetchSocStatsResponse> {
+
+    const response = await fetch("http://localhost:11111/history/fetch/soc-stats", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(args.request),
+    });
+
+    if (!response.ok) throw response;
+    return response.json();
+
+}
