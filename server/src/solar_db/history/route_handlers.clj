@@ -5,6 +5,12 @@
             [solar-db.validation.core :as v]
             [xtdb.api :as xt]))
 
+(defn fetch-temporal-bounds
+  "Fetches the temporal bounds of historical data, by granularity."
+  [_req]
+  (let [db (xt/db (db/get-node))]
+    (res/response {:data (history.db/fetch-temporal-bounds db)})))
+
 (defn fetch-detailed-history
   "Fetches detailed history for a period of time, at a 5-minute interval."
   [req]
@@ -12,6 +18,14 @@
         _    (v/validate :schema/FetchDetailedHistoryRequest req')
         db   (xt/db (db/get-node))]
     (res/response {:data (history.db/fetch-detailed-history db req')})))
+
+(defn fetch-detailed-stats
+  "Fetches detailed statistics aggregated by time interval over a day, for a period of time."
+  [req]
+  (let [req' (-> req :parameters :body)
+        _    (v/validate :schema/FetchDetailedHistoryStatsRequest req')
+        db   (xt/db (db/get-node))]
+    (res/response {:data (history.db/fetch-detailed-stats db req')})))
 
 (defn fetch-soc-stats
   "Fetches state of charge (SOC) statistics aggregated by time interval over a day, for a period"
