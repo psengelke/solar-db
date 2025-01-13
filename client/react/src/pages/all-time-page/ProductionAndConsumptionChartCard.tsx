@@ -4,22 +4,26 @@ import CardTitle from "@/widgets/card/CardTitle.tsx";
 import {useAppSelector} from "@/store/hooks.ts";
 import usePalette from "@/hooks/usePalette.ts";
 import colors from "tailwindcss/colors";
-import {DateTime} from "luxon";
 import {
     Area,
-    ComposedChart, Line,
+    ComposedChart,
+    Line,
     ResponsiveContainer,
     Tooltip,
     TooltipProps,
     XAxis,
     YAxis
 } from "recharts";
+import ChartTooltipItem from "@/widgets/charts/ChartTooltipItem.tsx";
+import ChartTooltipContent from "@/widgets/charts/ChartTooltipContent.tsx";
+import ChartTooltipTitle from "@/widgets/charts/ChartTooltipTitle.tsx";
+import ChartTooltipBase from "@/widgets/charts/ChartTooltipBase.tsx";
 
-export default function DayStatsWidget() {
+export default function ProductionAndConsumptionChartCard() {
     return (
         <Card className={"w-full"}>
             <CardHeader>
-                <CardTitle>Production & Consumption</CardTitle>
+                <CardTitle>Production vs Consumption</CardTitle>
             </CardHeader>
             <Chart/>
         </Card>
@@ -33,8 +37,6 @@ function Chart() {
         text: [colors.gray[500], colors.gray[300]],
         production: [colors.blue[500], colors.blue[300]],
         consumption: [colors.red[500], colors.red[300]],
-        grid: [colors.purple[500], colors.purple[300]],
-        battery: [colors.orange[500], colors.orange[300]],
     });
 
     const yTickFormat = Intl.NumberFormat("en-US", {notation: "compact", unitDisplay: "narrow"});
@@ -66,29 +68,41 @@ function Chart() {
                     tickLine={false}
                 />
 
-                <Tooltip content={ChartTooltip} cursor={false}/>
+                <Tooltip content={_ChartTooltip} cursor={false}/>
 
                 {[
                     {key: "stdDevProductionRange", color: palette.production},
                     {key: "stdDevConsumptionRange", color: palette.consumption},
-                    {key: "stdDevGridRange", color: palette.grid},
-                    {key: "stdDevBatteryRange", color: palette.battery},
                 ].map(({key, color}) => (<Area
                     key={key}
                     dataKey={key}
                     type="monotone"
-                    strokeWidth={0}
+                    stroke={"none"}
                     fill={color}
                     fillOpacity={0.4}
                     dot={false}
-                    activeDot={false}
+                    activeDot={{stroke: "transparent", r: 1}}
+                />))}
+
+                {[
+                    {key: "maxProduction", color: palette.production},
+                    {key: "minProduction", color: palette.production},
+                    {key: "maxConsumption", color: palette.consumption},
+                    {key: "minConsumption", color: palette.consumption}
+                ].map(({key, color}) => (<Line
+                    key={key}
+                    dataKey={key}
+                    type="monotone"
+                    stroke={color}
+                    strokeWidth={1}
+                    strokeDasharray={"1 1"}
+                    dot={false}
+                    activeDot={{stroke: "transparent", r: 2}}
                 />))}
 
                 {[
                     {key: "avgProduction", color: palette.production},
-                    {key: "avgConsumption", color: palette.consumption},
-                    {key: "avgGrid", color: palette.grid},
-                    {key: "avgBattery", color: palette.battery},
+                    {key: "avgConsumption", color: palette.consumption}
                 ].map(({key, color}) => (<Line
                     key={key}
                     dataKey={key}
@@ -106,7 +120,7 @@ function Chart() {
 
 }
 
-const ChartTooltip = (props: TooltipProps<any, any>) => {
+const _ChartTooltip = (props: TooltipProps<any, any>) => {
 
     const {active, payload, label} = props;
     if (!active || !payload) {
@@ -120,63 +134,79 @@ const ChartTooltip = (props: TooltipProps<any, any>) => {
 
     return (
 
-        <div className={"p-2 bg-white dark:bg-gray-800 rounded-lg shadow-md"}>
-            <div className={"text-center"}>
-                <span>{DateTime.fromISO(label).toFormat("HH:mm")}</span>
-            </div>
-            <div className={"flex flex-col gap-2"}>
+        <ChartTooltipBase>
 
-                <ChartTooltipSeriesPoint
+            <ChartTooltipTitle>{label}</ChartTooltipTitle>
+
+            <ChartTooltipContent>
+
+                <_ChartTooltipItem
                     label={"Production"}
                     value={data.avgProduction?.value}
                     color={data.avgProduction?.color}
                 />
 
-                <ChartTooltipSeriesPoint
+                <_ChartTooltipItem
+                    variant={"secondary"}
+                    label={"Spread"}
+                    value={data.stdDevProductionRange?.value}
+                    color={data.minProduction?.color}
+                />
+
+
+                <_ChartTooltipItem
+                    variant={"secondary"}
+                    label={"Min/Max"}
+                    value={[data.minProduction?.value, data.maxProduction?.value]}
+                    color={data.minProduction?.color}
+                />
+
+                <_ChartTooltipItem
                     label={"Consumption"}
                     value={data.avgConsumption?.value}
                     color={data.avgConsumption?.color}
                 />
 
-                <ChartTooltipSeriesPoint
-                    label={"Grid"}
-                    value={data.avgGrid?.value}
-                    color={data.avgGrid?.color}
+                <_ChartTooltipItem
+                    variant={"secondary"}
+                    label={"Spread"}
+                    value={data.stdDevConsumptionRange?.value}
+                    color={data.minConsumption?.color}
                 />
 
-                <ChartTooltipSeriesPoint
-                    label={"Battery"}
-                    value={data.avgBattery?.value}
-                    color={data.avgBattery?.color}
+                <_ChartTooltipItem
+                    variant={"secondary"}
+                    label={"Min/Max"}
+                    value={[data.minConsumption?.value, data.maxConsumption?.value]}
+                    color={data.minConsumption?.color}
                 />
 
-            </div>
-        </div>
+            </ChartTooltipContent>
+        </ChartTooltipBase>
 
     );
-
 }
 
-interface ChartTooltipSeriesPointProps {
+interface _ChartTooltipItemProps {
+    variant?: "primary" | "secondary";
     label: string;
-    value: number;
+    value: number | [number, number];
     color: string;
 }
 
-const ChartTooltipSeriesPoint = (props: ChartTooltipSeriesPointProps) => {
+const _ChartTooltipItem = (props: _ChartTooltipItemProps) => {
 
     const fmt = Intl.NumberFormat("en-US", {notation: "compact", unitDisplay: "narrow"});
-    const fmtValue = fmt.format(props.value) + " Watts";
+    const fmtValue = Array.isArray(props.value)
+        ? `${fmt.format(props.value[0])} - ${fmt.format(props.value[1])} Watts`
+        : fmt.format(props.value) + " Watts";
 
     return (
-        <div className={"flex gap-3 justify-between items-center"}>
-            <div className={"flex gap-2 items-center"}>
-                <div className={"rounded-full h-[10px] w-[10px]"}
-                     style={{backgroundColor: props.color}}
-                />
-                <span className={"text-gray-700 dark:text-gray-300"}>{props.label}</span>
-            </div>
-            <span className={"text-gray-700 dark:text-gray-300"}>{fmtValue}</span>
-        </div>
+        <ChartTooltipItem
+            variant={props.variant}
+            label={props.label}
+            value={fmtValue}
+            color={props.color}
+        />
     );
 }

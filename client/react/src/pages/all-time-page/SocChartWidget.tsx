@@ -6,15 +6,19 @@ import usePalette from "@/hooks/usePalette.ts";
 import colors from "tailwindcss/colors";
 import {
     Area,
-    ComposedChart, Line,
+    ComposedChart,
+    Line,
     ResponsiveContainer,
     Tooltip,
     TooltipProps,
     XAxis,
     YAxis
 } from "recharts";
+import ChartTooltipItem from "@/widgets/charts/ChartTooltipItem.tsx";
+import ChartTooltipContent from "@/widgets/charts/ChartTooltipContent.tsx";
+import ChartTooltipTitle from "@/widgets/charts/ChartTooltipTitle.tsx";
 
-export default function SocStatsWidget() {
+export default function SocChartWidget() {
     return (
         <Card className={"w-full"}>
             <CardHeader>
@@ -32,7 +36,6 @@ const Chart = () => {
         text: [colors.gray[500], colors.gray[300]],
         min: [colors.red[500], colors.red[300]],
         max: [colors.blue[500], colors.blue[300]],
-        median: [colors.violet[500], colors.violet[300]],
         avg: [colors.green[500], colors.green[300]],
     });
 
@@ -70,13 +73,25 @@ const Chart = () => {
                     fill={palette.avg}
                     fillOpacity={0.2}
                     dot={false}
-                    activeDot={false}
+                    activeDot={{stroke: "transparent", r: 1}}
                 />
 
                 {[
                     {key: "maxSoc", color: palette.max},
                     {key: "minSoc", color: palette.min},
-                    {key: "medianSoc", color: palette.median},
+                    {key: "medianSoc", color: palette.avg}
+                ].map(({key, color}) => (<Line
+                    key={key}
+                    dataKey={key}
+                    type="monotone"
+                    stroke={color}
+                    strokeWidth={1}
+                    strokeDasharray={"1 1"}
+                    dot={false}
+                    activeDot={{stroke: "transparent", r: 2}}
+                />))}
+
+                {[
                     {key: "avgSoc", color: palette.avg},
                 ].map(({key, color}) => (
                     <Line
@@ -112,70 +127,68 @@ const ChartTooltip = (props: TooltipProps<any, any>) => {
     return (
         <div className={"bg-gray-50 dark:bg-gray-800 p-2 rounded-lg shadow-lg"}>
 
-            <p className={"text-gray-700 dark:text-gray-300 pb-2 w-full text-center"}>
-                {label}
-            </p>
+            <ChartTooltipTitle>{label}</ChartTooltipTitle>
 
-            <div className={"flex flex-col gap-1"}>
+            <ChartTooltipContent>
 
-                <ChartTooltipSeriesPoint
-                    label={"Min"}
-                    value={data.minSoc?.value}
-                    color={data.minSoc?.color}
-                />
-
-                <ChartTooltipSeriesPoint
-                    label={"Max"}
-                    value={data.maxSoc?.value}
-                    color={data.maxSoc?.stroke}
-                />
-
-                <ChartTooltipSeriesPoint
+                <_ChartTooltipItem
                     label={"Avg."}
                     value={data.avgSoc?.value}
                     color={data.avgSoc?.color}
                 />
 
-                <ChartTooltipSeriesPoint
-                    label={"σ"}
-                    value={data.stdDevSocRange?.value}
-                    color={data.stdDevSocRange?.color}
-                />
-
-                <ChartTooltipSeriesPoint
+                <_ChartTooltipItem
+                    variant={"secondary"}
                     label={"Median"}
                     value={data.medianSoc?.value}
                     color={data.medianSoc?.color}
                 />
 
-            </div>
+                <_ChartTooltipItem
+                    variant={"secondary"}
+                    label={"Spread"}
+                    value={data.stdDevSocRange?.value}
+                    color={data.stdDevSocRange?.color}
+                />
+
+                <_ChartTooltipItem
+                    label={"Min"}
+                    value={data.minSoc?.value}
+                    color={data.minSoc?.color}
+                />
+
+                <_ChartTooltipItem
+                    label={"Max"}
+                    value={data.maxSoc?.value}
+                    color={data.maxSoc?.stroke}
+                />
+
+            </ChartTooltipContent>
         </div>
     );
 
 };
 
-interface ChartTooltipSeriesPointProps {
+interface _ChartTooltipItemProps {
+    variant?: "primary" | "secondary";
     label: string;
     value: number | [number, number];
     color: string;
 }
 
-const ChartTooltipSeriesPoint = (props: ChartTooltipSeriesPointProps) => {
+const _ChartTooltipItem = (props: _ChartTooltipItemProps) => {
 
     const fmt = Intl.NumberFormat("en-US", {style: "percent"});
-    const fmtValue =  Array.isArray(props.value)
+    const fmtValue = Array.isArray(props.value)
         ? `${fmt.format(props.value[0])} - ${fmt.format(props.value[1])}`
         : fmt.format(props.value);
 
     return (
-        <div className={"flex gap-3 justify-between items-center"}>
-            <div className={"flex gap-2 items-center"}>
-                <div className={"rounded-full h-[10px] w-[10px]"}
-                     style={{backgroundColor: props.color}}
-                />
-                <span className={"text-gray-700 dark:text-gray-300"}>{props.label}</span>
-            </div>
-            <span className={"text-gray-700 dark:text-gray-300"}>{fmtValue}</span>
-        </div>
+        <ChartTooltipItem
+            variant={props.variant}
+            label={props.label}
+            value={fmtValue}
+            color={props.color}
+        />
     );
 }

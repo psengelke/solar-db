@@ -103,6 +103,13 @@
                    (median ?battery)
                    (stddev ?battery)
 
+                   ;; Solar
+                   (min ?solar)
+                   (max ?solar)
+                   (avg ?solar)
+                   (median ?solar)
+                   (stddev ?solar)
+
                    ;; State of Charge
                    (min ?soc)
                    (max ?soc)
@@ -123,6 +130,8 @@
                    [?e :consumption ?consumption]
                    [?e :grid-draw ?grid]
                    [?e :battery-discharge ?battery]
+                   [(- ?consumption ?grid ?battery) ?solar-]
+                   [(max 0 ?solar-) ?solar]
                    [?e :soc ?soc]]}
 
          (:start-timestamp req)
@@ -133,6 +142,7 @@
                   min-consumption max-consumption avg-consumption median-consumption std-dev-consumption
                   min-grid max-grid avg-grid median-grid std-dev-grid
                   min-battery max-battery avg-battery median-battery std-dev-battery
+                  min-solar max-solar avg-solar median-solar std-dev-solar
                   min-soc max-soc avg-soc median-soc std-dev-soc]]
 
               {:time                      time
@@ -173,8 +183,16 @@
                :std-dev-battery-range     [(max min-battery (- avg-battery std-dev-battery))
                                            (min max-battery (+ avg-battery std-dev-battery))]
 
-               ;; State of Charge
+               ;; Solar
+               :min-solar                 min-solar
+               :max-solar                 max-solar
+               :avg-solar                 avg-solar
+               :median-solar              median-solar
+               :std-dev-solar             std-dev-solar
+               :std-dev-solar-range       [(max min-solar (- avg-solar std-dev-solar))
+                                           (min max-solar (+ avg-solar std-dev-solar))]
 
+               ;; State of Charge
                :min-soc                   min-soc
                :max-soc                   max-soc
                :avg-soc                   avg-soc

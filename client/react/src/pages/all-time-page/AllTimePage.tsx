@@ -1,9 +1,10 @@
 import Page from "@/widgets/page/Page.tsx";
-import SocStatsWidget from "@/pages/all-time-page/SocStatsWidget.tsx";
-import DayStatsWidget from "@/pages/all-time-page/DayStatsWidget.tsx";
+import SocChartWidget from "@/pages/all-time-page/SocChartWidget.tsx";
+import ProductionAndConsumptionChartCard from "@/pages/all-time-page/ProductionAndConsumptionChartCard.tsx";
 import {useAppDispatch} from "@/store/hooks.ts";
 import {useEffect} from "react";
 import {fetchData} from "@/pages/all-time-page/allTimePageSlice.ts";
+import ConsumptionChartCard from "@/pages/all-time-page/ConsumptionChartCard.tsx";
 
 export default function AllTimePage() {
 
@@ -13,8 +14,9 @@ export default function AllTimePage() {
     return (
         <Page>
             <div className={"flex flex-wrap gap-4"}>
-                <DayStatsWidget/>
-                <SocStatsWidget/>
+                <ProductionAndConsumptionChartCard/>
+                <ConsumptionChartCard/>
+                <SocChartWidget/>
             </div>
         </Page>
     );

@@ -104,6 +104,12 @@ export interface DetailedStatsDatum {
     medianBattery: number;
     stdDevBattery: number;
     stdDevBatteryRange: [number, number];
+    minSolar: number;
+    maxSolar: number;
+    avgSolar: number;
+    medianSolar: number;
+    stdDevSolar: number;
+    stdDevSolarRange: [number, number];
     minSoc: number;
     maxSoc: number;
     avgSoc: number;

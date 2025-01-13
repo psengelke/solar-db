@@ -102,6 +102,13 @@
               [:std-dev-battery :double]
               [:std-dev-battery-range [:tuple :double :double]]
 
+              [:min-solar :double]
+              [:max-solar :double]
+              [:avg-solar :double]
+              [:median-solar :double]
+              [:std-dev-solar :double]
+              [:std-dev-solar-range [:tuple :double :double]]
+
               [:min-soc :double]
               [:max-soc :double]
               [:avg-soc :double]
