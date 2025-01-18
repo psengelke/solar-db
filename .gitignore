@@ -3,3 +3,4 @@
 **/*.iml
 **/.nrepl-port
 **/out
+.DS_Store
