@@ -39,6 +39,7 @@
           :xtdb/index-store    (->kv-store index-store-file)})
        (reset! -node)))
 
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
 (defn stop-xtdb!
   "Stops the current node and clears it."
   []
