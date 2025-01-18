@@ -42,14 +42,15 @@
 (defn stop-xtdb!
   "Stops the current node and clears it."
   []
-  (let [node @-node]
-    (compare-and-set! -node node nil)
-    (.close node)))
+  (when-let [node @-node]
+    (when (compare-and-set! -node node nil)
+      (.close node))))
 
 (defn get-node
   "Gets an XTDB node."
   []
   (or @-node
       (locking -node
-        (start-xtdb!)
-        @-node)))
+        (or @-node
+            (do (start-xtdb!)
+                @-node)))))
