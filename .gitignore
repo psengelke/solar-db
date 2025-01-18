@@ -4,3 +4,6 @@
 **/.nrepl-port
 **/out
 .DS_Store
+**/.clj-kondo
+**/.calva
+**/.lsp
