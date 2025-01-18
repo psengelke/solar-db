@@ -9,7 +9,7 @@
   "Fetches the temporal bounds of historical data, by granularity."
   [_req]
   (let [db (xt/db (db/get-node))]
-    (res/response {:data (history.db/fetch-temporal-bounds db)})))
+    (res/response (history.db/fetch-temporal-bounds db))))
 
 (defn fetch-detailed-history
   "Fetches detailed history for a period of time, at a 5-minute interval."
