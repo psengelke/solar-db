@@ -18,7 +18,7 @@ import ChartTooltipItem from "@/widgets/charts/ChartTooltipItem.tsx";
 import ChartTooltipContent from "@/widgets/charts/ChartTooltipContent.tsx";
 import ChartTooltipTitle from "@/widgets/charts/ChartTooltipTitle.tsx";
 
-export default function SocChartWidget() {
+export default function SocChartCard() {
     return (
         <Card className={"w-full"}>
             <CardHeader>

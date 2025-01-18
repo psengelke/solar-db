@@ -1,5 +1,5 @@
 import Page from "@/widgets/page/Page.tsx";
-import SocChartWidget from "@/pages/all-time-page/SocChartWidget.tsx";
+import SocChartCard from "@/pages/all-time-page/SocChartCard";
 import ProductionAndConsumptionChartCard from "@/pages/all-time-page/ProductionAndConsumptionChartCard.tsx";
 import {useAppDispatch} from "@/store/hooks.ts";
 import {useEffect} from "react";
@@ -16,7 +16,7 @@ export default function AllTimePage() {
             <div className={"flex flex-wrap gap-4"}>
                 <ProductionAndConsumptionChartCard/>
                 <ConsumptionChartCard/>
-                <SocChartWidget/>
+                <SocChartCard/>
             </div>
         </Page>
     );
