@@ -5,7 +5,7 @@
   "Converts a string of the form `a-b-c` to `aBC`."
   [s]
   (let [parts (str/split s #"-")]
-    (if (seq parts)
+    (when (seq parts)
       (->> parts rest
            (map str/capitalize)
            (cons (first parts))
