@@ -1,14 +1,13 @@
-import Page from "@/widgets/page/Page.tsx";
+import { fetchDetailedHistory, selectDate, setDate } from "@/pages/day-page/dayPageSlice.ts";
 import DetailedHistoryWidget from "@/pages/day-page/DetailedHistoryWidget.tsx";
-import SocStatsWidget from "@/pages/day-page/SocStatsWidget.tsx";
-import DateField from "@/widgets/inputs/DateField.tsx";
-import {useAppDispatch, useAppSelector} from "@/store/hooks.ts";
-import {fetchDetailedHistory, selectDate, setDate} from "@/pages/day-page/dayPageSlice.ts";
-import _ from "lodash";
-import {useCallback, useEffect} from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks.ts";
 import IconButton from "@/widgets/buttons/IconButton.tsx";
 import Icon from "@/widgets/Icon.tsx";
-import {DateTime} from "luxon";
+import DateField from "@/widgets/inputs/DateField.tsx";
+import Page from "@/widgets/page/Page.tsx";
+import { DateTime } from "luxon";
+import { useCallback, useEffect } from "react";
+import SocChartCard from "./SocChartCard";
 
 export default function DayPage() {
 
@@ -20,7 +19,7 @@ export default function DayPage() {
             <div className={"flex flex-wrap gap-4"}>
                 <Controls/>
                 <DetailedHistoryWidget/>
-                <SocStatsWidget/>
+                <SocChartCard/>
             </div>
         </Page>
     );
