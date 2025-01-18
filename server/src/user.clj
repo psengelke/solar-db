@@ -4,8 +4,8 @@
             [solar-db.db :as db]
             [solar-db.router.core :as router])
   (:import
-    (clojure.lang IPersistentMap)
-    (java.io Writer)))
+   (clojure.lang IPersistentMap)
+   (java.io Writer)))
 
 ; Don't use namespaced maps by default in the REPL.
 (defmethod print-method IPersistentMap [m, ^Writer w]
@@ -18,8 +18,8 @@
   (router/restart!))
 
 (cr/init
-  {:dirs        ["src"]
-   :reload-hook 'after-cr-reload!})
+ {:dirs        ["src"]
+  :reload-hook 'after-cr-reload!})
 
 (defn start! [] (router/start!))
 (defn restart! [] (cr/reload))
@@ -33,4 +33,5 @@
   (start!)
   (restart!)
 
+  ;;
   )
