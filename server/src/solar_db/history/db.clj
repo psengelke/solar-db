@@ -1,16 +1,21 @@
 (ns solar-db.history.db
-  (:require [tick.core]
-            [xtdb.api :as xt]))
+  (:require
+   [tick.core]
+   [xtdb.api :as xt]))
 
 (defn fetch-temporal-bounds
   "Fetches the temporal bounds of historical data, by granularity."
   [db]
-  (xt/q db
+  (->> (xt/q db
         '{:find  [?granularity (min ?t) (max ?t)]
           :where [[?e :granularity ?granularity]
                   (or-join [?e ?granularity ?t]
                            (and [(= ?granularity :detailed)] [?e :timestamp ?t])
-                           [?e :date ?t])]}))
+                           [?e :date ?t])]})
+
+  (reduce (fn [acc [granularity min-t max-t]]
+            (assoc acc granularity [min-t max-t]))
+          {})))
 
 (defn fetch-detailed-history
   "Fetches detailed history for a period of time, at a 5-minute interval."
